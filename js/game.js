@@ -6,6 +6,8 @@ let attempts = 0;
 let matchedPairs = 0;
 let totalPairs = 5;
 
+let verbErrors = loadVerbErrors();
+
 function shuffleArray(array) {
   const shuffled = [...array];
 
@@ -34,7 +36,7 @@ function selectRandomVerbs(amount, type = "all") {
   return shuffledVerbs.slice(0, amount);
 }
 
-function createCards(selectedVerbs) {
+function createCards(selectedVerbs, mode) {
   const cards = [];
 
   selectedVerbs.forEach((verb) => {
@@ -44,10 +46,27 @@ function createCards(selectedVerbs) {
       role: "infinitive",
     });
 
+    let secondValue;
+    let secondRole;
+
+    if (mode === "past") {
+      secondValue = verb.past;
+      secondRole = "past";
+    } else if (mode === "participle") {
+      secondValue = verb.participle;
+      secondRole = "participle";
+    } else if (mode === "gerund") {
+      secondValue = verb.gerund;
+      secondRole = "gerund";
+    } else {
+      secondValue = verb.spanish;
+      secondRole = "spanish";
+    }
+
     cards.push({
       verbId: verb.id,
-      value: verb.spanish,
-      role: "spanish",
+      value: secondValue,
+      role: secondRole,
     });
   });
 
@@ -55,6 +74,10 @@ function createCards(selectedVerbs) {
 }
 
 function startGame() {
+  const victoryMessage = document.querySelector("#victory-message");
+
+  victoryMessage.classList.add("hidden");
+
   resetTurn();
 
   attempts = 0;
@@ -62,16 +85,15 @@ function startGame() {
 
   const settings = getGameSettings();
 
+  updateGameInfo(settings);
+
   totalPairs = settings.amount;
 
   updateStats();
 
-  console.log("Starting Verb Memory...");
-  console.log("Settings:", settings);
-
   const selectedVerbs = selectRandomVerbs(settings.amount, settings.type);
 
-  const cards = createCards(selectedVerbs);
+  const cards = createCards(selectedVerbs, settings.mode);
 
   renderCards(cards);
 }
@@ -180,6 +202,11 @@ function handleMatch() {
 function handleMismatch() {
   console.log("No match");
 
+  registerError(firstCard);
+  registerError(secondCard);
+
+  console.log("Verb errors:", verbErrors);
+
   setTimeout(() => {
     firstCard.classList.remove("flipped");
     secondCard.classList.remove("flipped");
@@ -205,7 +232,7 @@ function checkGameComplete() {
     console.log("Game completed!");
 
     setTimeout(() => {
-      alert(`Game completed!\nAttempts: ${attempts}`);
+      showVictoryMessage();
     }, 300);
   }
 }
@@ -219,8 +246,197 @@ function getGameSettings() {
     'input[name="verb-amount"]:checked',
   );
 
+  const selectedMode = document.querySelector(
+    'input[name="practice-mode"]:checked',
+  );
+
   return {
     type: selectedType.value,
     amount: Number(selectedAmount.value),
+    mode: selectedMode.value,
   };
+}
+
+function showVictoryMessage() {
+  const victoryMessage = document.querySelector("#victory-message");
+
+  const finalAttempts = document.querySelector("#final-attempts");
+
+  finalAttempts.textContent = attempts;
+
+  renderDifficultVerbs();
+
+  victoryMessage.classList.remove("hidden");
+}
+
+function updateGameInfo(settings) {
+  const gameInfo = document.querySelector("#current-game-info");
+
+  const typeLabels = {
+    regular: "Regular",
+    irregular: "Irregular",
+    all: "All verbs",
+  };
+
+  const modeLabels = {
+    spanish: "Infinitive ↔ Spanish",
+    past: "Infinitive ↔ Past",
+    participle: "Infinitive ↔ Past Participle",
+    gerund: "Infinitive ↔ Gerund",
+  };
+
+  gameInfo.textContent =
+    `${typeLabels[settings.type]} · ` +
+    `${modeLabels[settings.mode]} · ` +
+    `${settings.amount} verbs`;
+
+  gameInfo.classList.remove("hidden");
+}
+
+function registerError(card) {
+  const verbId = card.dataset.verbId;
+
+  if (verbErrors[verbId] === undefined) {
+    verbErrors[verbId] = 0;
+  }
+
+  verbErrors[verbId]++;
+
+  saveVerbErrors();
+}
+
+function getDifficultVerbs() {
+  return Object.entries(verbErrors)
+    .map(([verbId, errors]) => {
+      const verb = verbs.find((verb) => verb.id === Number(verbId));
+
+      return {
+        verb,
+        errors,
+      };
+    })
+    .sort((a, b) => b.errors - a.errors);
+}
+
+function renderDifficultVerbs() {
+  const reviewSection = document.querySelector("#review-section");
+
+  const reviewList = document.querySelector("#review-list");
+
+  const difficultVerbs = getDifficultVerbs();
+
+  reviewList.innerHTML = "";
+
+  if (difficultVerbs.length === 0) {
+    reviewSection.classList.add("hidden");
+
+    return;
+  }
+
+  difficultVerbs.slice(0, 5).forEach((item) => {
+    const listItem = document.createElement("li");
+
+    listItem.innerHTML = `
+                <span>
+                    ${item.verb.infinitive.toUpperCase()}
+                </span>
+
+                <span>
+                    ${item.errors} error${item.errors === 1 ? "" : "s"}
+                </span>
+            `;
+
+    reviewList.appendChild(listItem);
+  });
+
+  reviewSection.classList.remove("hidden");
+}
+
+function startDifficultVerbsGame() {
+  const difficultVerbs = getDifficultVerbs();
+
+  if (difficultVerbs.length < 2) {
+    alert("You need more recorded errors before starting this practice mode.");
+
+    return;
+  }
+
+  const settings = getGameSettings();
+
+  const amount = Math.min(settings.amount, difficultVerbs.length);
+
+  const selectedVerbs = difficultVerbs
+    .slice(0, amount)
+    .map((item) => item.verb);
+
+  // Reset game state
+  resetTurn();
+
+  attempts = 0;
+  matchedPairs = 0;
+  totalPairs = selectedVerbs.length;
+
+  // Hide victory message
+  const victoryMessage = document.querySelector("#victory-message");
+
+  victoryMessage.classList.add("hidden");
+
+  // Update current game information
+  const gameInfo = document.querySelector("#current-game-info");
+
+  const modeLabels = {
+    spanish: "Infinitive ↔ Spanish",
+    past: "Infinitive ↔ Past",
+    participle: "Infinitive ↔ Past Participle",
+    gerund: "Infinitive ↔ Gerund",
+  };
+
+  gameInfo.textContent =
+    `Difficult verbs · ` +
+    `${modeLabels[settings.mode]} · ` +
+    `${selectedVerbs.length} verbs`;
+
+  gameInfo.classList.remove("hidden");
+
+  // Update counters
+  updateStats();
+
+  // Create cards using the currently selected practice mode
+  const cards = createCards(selectedVerbs, settings.mode);
+
+  // Draw cards
+  renderCards(cards);
+
+  console.log("Starting difficult verbs practice...");
+  console.log("Selected verbs:", selectedVerbs);
+}
+
+function loadVerbErrors() {
+  const savedErrors = localStorage.getItem("verbErrors");
+
+  if (savedErrors === null) {
+    return {};
+  }
+
+  return JSON.parse(savedErrors);
+}
+
+function saveVerbErrors() {
+  localStorage.setItem("verbErrors", JSON.stringify(verbErrors));
+}
+
+function resetProgress() {
+  verbErrors = {};
+
+  localStorage.removeItem("verbErrors");
+
+  const reviewSection = document.querySelector("#review-section");
+
+  const reviewList = document.querySelector("#review-list");
+
+  reviewList.innerHTML = "";
+
+  reviewSection.classList.add("hidden");
+
+  console.log("Progress reset.");
 }
