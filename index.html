@@ -17,9 +17,14 @@
       </header>
 
       <section class="game-container">
-        <h2>Verb Memory</h2>
+        <div class="game-topbar">
+          <div>
+            <h2>Verb Memory</h2>
+            <p>Practice English verbs by finding the correct pairs.</p>
+          </div>
+        </div>
 
-        <div class="game-settings">
+        <div class="game-settings" id="game-settings">
           <div class="setting-group">
             <h3>Verb type</h3>
 
@@ -57,9 +62,44 @@
               15
             </label>
           </div>
+
+          <div class="setting-group">
+            <h3>Practice mode</h3>
+
+            <label>
+              <input
+                type="radio"
+                name="practice-mode"
+                value="spanish"
+                checked
+              />
+              Infinitive ↔ Spanish
+            </label>
+
+            <label>
+              <input type="radio" name="practice-mode" value="past" />
+              Infinitive ↔ Past
+            </label>
+
+            <label>
+              <input type="radio" name="practice-mode" value="participle" />
+              Infinitive ↔ Past Participle
+            </label>
+
+            <label>
+              <input type="radio" name="practice-mode" value="gerund" />
+              Infinitive ↔ Gerund
+            </label>
+          </div>
         </div>
 
-        <button id="start-button">Start Game</button>
+        <div class="game-actions">
+          <button id="start-button">Start Game</button>
+
+          <button id="reset-progress-button">Reset Progress</button>
+        </div>
+
+        <div id="current-game-info" class="current-game-info hidden"></div>
 
         <div class="game-stats">
           <p>
@@ -76,6 +116,27 @@
         </div>
 
         <div id="game-board" class="game-board"></div>
+
+        <div id="victory-message" class="victory-message hidden">
+          <h2>Game completed!</h2>
+
+          <p>
+            Attempts:
+            <span id="final-attempts">0</span>
+          </p>
+
+          <div id="review-section" class="review-section hidden">
+            <h3>Verbs to review</h3>
+
+            <ul id="review-list"></ul>
+
+            <button id="practice-difficult-button">
+              Practice difficult verbs
+            </button>
+          </div>
+
+          <button id="play-again-button">Play Again</button>
+        </div>
       </section>
     </main>
 
