@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Verb Memory</title>
+
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+
+  <body>
+    <main class="app">
+      <header class="app-header">
+        <h1>Verb Memory</h1>
+        <p>Practice English verbs while playing.</p>
+      </header>
+
+      <section class="game-container">
+        <h2>Verb Memory</h2>
+
+        <div class="game-settings">
+          <div class="setting-group">
+            <h3>Verb type</h3>
+
+            <label>
+              <input type="radio" name="verb-type" value="regular" />
+              Regular
+            </label>
+
+            <label>
+              <input type="radio" name="verb-type" value="irregular" />
+              Irregular
+            </label>
+
+            <label>
+              <input type="radio" name="verb-type" value="all" checked />
+              All
+            </label>
+          </div>
+
+          <div class="setting-group">
+            <h3>Number of verbs</h3>
+
+            <label>
+              <input type="radio" name="verb-amount" value="5" checked />
+              5
+            </label>
+
+            <label>
+              <input type="radio" name="verb-amount" value="10" />
+              10
+            </label>
+
+            <label>
+              <input type="radio" name="verb-amount" value="15" />
+              15
+            </label>
+          </div>
+        </div>
+
+        <button id="start-button">Start Game</button>
+
+        <div class="game-stats">
+          <p>
+            Attempts:
+            <span id="attempts">0</span>
+          </p>
+
+          <p>
+            Pairs:
+            <span id="pairs">0</span>
+            /
+            <span id="total-pairs">5</span>
+          </p>
+        </div>
+
+        <div id="game-board" class="game-board"></div>
+      </section>
+    </main>
+
+    <script src="js/verbs.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
