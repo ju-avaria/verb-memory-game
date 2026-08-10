@@ -105,6 +105,7 @@ function renderCards(cards) {
 
   cards.forEach((card) => {
     const cardElement = document.createElement("div");
+    cardElement.setAttribute("tabindex", "0");
 
     cardElement.classList.add("card");
 
@@ -119,6 +120,14 @@ function renderCards(cards) {
     cardElement.addEventListener("click", () => {
       console.log("Card clicked:", card.value);
       flipCard(cardElement);
+    });
+
+    cardElement.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+
+        flipCard(cardElement);
+      }
     });
 
     gameBoard.appendChild(cardElement);
