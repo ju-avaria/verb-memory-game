@@ -262,6 +262,20 @@ body {
     cursor: pointer;
 }
 
+.setting-group input[type="radio"] {
+    accent-color: var(--accent);
+
+    width: 16px;
+    height: 16px;
+}
+
+.setting-group label {
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+}
+
 
 /* ==================================================
    GAME ACTIONS
@@ -305,22 +319,22 @@ button {
         color 0.2s ease,
         transform 0.15s ease,
         box-shadow 0.2s ease;
+
+    user-select: none;
 }
-
-
-button:hover {
-    background-color: var(--accent);
-    color: #001014;
-
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 0 16px var(--accent-glow);
-}
-
 
 button:active {
     transform: translateY(0);
+}
+
+button:disabled {
+    opacity: 0.45;
+
+    cursor: not-allowed;
+
+    transform: none;
+
+    box-shadow: none;
 }
 
 
@@ -412,19 +426,9 @@ button:active {
         background-color 0.2s ease,
         border-color 0.2s ease,
         box-shadow 0.2s ease;
+
+    will-change: transform;
 }
-
-
-.card:hover {
-    transform: translateY(-3px);
-
-    border-color: var(--accent);
-
-    box-shadow:
-        inset 0 0 14px var(--accent-glow),
-        0 0 12px var(--accent-glow);
-}
-
 
 .card::before,
 .card::after {
@@ -473,6 +477,9 @@ button:active {
 
 .card-value {
     display: none;
+    max-width: 100%;
+
+    line-height: 1.25;
 }
 
 
@@ -480,6 +487,8 @@ button:active {
    FLIPPED CARD
    ================================================== */
 .card.flipped {
+    transform: scale(0.98);
+
     background-color: var(--card-flipped-bg);
 
     border-color: var(--accent);
@@ -510,6 +519,8 @@ button:active {
     opacity: var(--matched-opacity);
 
     cursor: default;
+
+    transform: scale(0.97);
 
     box-shadow: none;
 }
@@ -629,6 +640,12 @@ button:active {
         align-items: center;
     }
 
+    .setting-group label {
+        width: 100%;
+        max-width: 240px;
+
+        justify-content: flex-start;
+    }
 
     .game-stats {
         gap: 20px;
@@ -726,4 +743,36 @@ button:active {
 
 .theme-toggle-button:hover {
     background-color: var(--accent-hover);
+}
+
+button:focus-visible,
+input:focus-visible,
+.card:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+
+@media (hover: hover) {
+
+    .card:hover {
+        transform: translateY(-3px);
+
+        border-color: var(--accent);
+
+        box-shadow:
+            inset 0 0 14px var(--accent-glow),
+            0 0 12px var(--accent-glow);
+    }
+
+
+    button:hover {
+        background-color: var(--accent);
+        color: #001014;
+
+        transform: translateY(-2px);
+
+        box-shadow:
+            0 0 16px var(--accent-glow);
+    }
+
 }
